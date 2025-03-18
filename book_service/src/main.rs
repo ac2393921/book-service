@@ -1,5 +1,7 @@
-// use crate::domain::value_objects::book_id::BookId;
 // use domain::value_objects::book_id::BookId;
+mod domain;
+
+use crate::domain::value_objects::book_id::BookId;
 
 use actix_web::middleware::{NormalizePath, TrailingSlash};
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
@@ -23,5 +25,6 @@ async fn initialize_server() -> std::io::Result<()> {
 }
 
 async fn book() -> impl Responder {
-    HttpResponse::Ok().body("book service")
+    let book_id = BookId::new("123".to_string());
+    HttpResponse::Ok().body(format!("Book ID: {}", book_id.value()))
 }
