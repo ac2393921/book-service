@@ -1,27 +1,37 @@
 use derive_getters::Getters;
+use thiserror::Error;
+
 #[derive(Debug, Clone, Getters, PartialEq, Eq)]
 pub struct BookId {
     value: String,
+}
+
+#[derive(Debug, Error, PartialEq, Eq)]
+pub enum BookIdError {
+    #[error("ISBNの文字数が不正です")]
+    InvalidLength,
+    #[error("ISBNの形式が不正です")]
+    InvalidFormat,
 }
 
 impl BookId {
     const MAX_LENGTH: usize = 13;
     const MIN_LENGTH: usize = 10;
 
-    pub fn new(value: String) -> Result<Self, String> {
+    pub fn new(value: String) -> Result<Self, BookIdError> {
         Self::validate(&value)?;
         Ok(Self { value })
     }
 
-    fn validate(isbn: &str) -> Result<(), String> {
+    fn validate(isbn: &str) -> Result<(), BookIdError> {
         let len = isbn.len();
 
         if len < Self::MIN_LENGTH || len > Self::MAX_LENGTH {
-            return Err("ISBNの文字数が不正です".to_string());
+            return Err(BookIdError::InvalidLength);
         }
 
         if !Self::is_valid_isbn10(isbn) && !Self::is_valid_isbn13(isbn) {
-            return Err("ISBNの文字数が不正です".to_string());
+            return Err(BookIdError::InvalidFormat);
         }
 
         Ok(())
@@ -150,7 +160,7 @@ mod tests {
         let long_isbn = "1".repeat(101);
         let result = BookId::new(long_isbn);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidLength);
     }
 
     // 不正なフォーマットの場合にエラーを投げる
@@ -160,36 +170,36 @@ mod tests {
         let invalid_isbn = "416715805X1";
         let result = BookId::new(invalid_isbn.to_string());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidFormat);
 
         // 13桁の ISBN で数字以外の文字が含まれる
-        let invalid_isbn = "978416715805X7";
+        let invalid_isbn = "978416715805X";
         let result = BookId::new(invalid_isbn.to_string());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidFormat);
 
         // 13桁の ISBN で数字以外の文字が含まれる
-        let invalid_isbn = "978416715805X7";
+        let invalid_isbn = "978416715805X";
         let result = BookId::new(invalid_isbn.to_string());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidFormat);
 
         // 13桁の ISBN で数字以外の文字が含まれる
-        let invalid_isbn = "978416715805X7";
+        let invalid_isbn = "978416715805X";
         let result = BookId::new(invalid_isbn.to_string());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidFormat);
 
         // 13桁の ISBN で数字以外の文字が含まれる
-        let invalid_isbn = "978416715805X7";
+        let invalid_isbn = "978416715805X";
         let result = BookId::new(invalid_isbn.to_string());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidFormat);
 
         // 13桁の ISBN で数字以外の文字が含まれる
-        let invalid_isbn = "978416715805X7";
+        let invalid_isbn = "978416715805X";
         let result = BookId::new(invalid_isbn.to_string());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "ISBNの文字数が不正です");
+        assert_eq!(result.unwrap_err(), BookIdError::InvalidFormat);
     }
 }
