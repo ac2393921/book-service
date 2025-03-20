@@ -25,6 +25,6 @@ async fn initialize_server() -> std::io::Result<()> {
 }
 
 async fn book() -> impl Responder {
-    let book_id = BookId::new("123".to_string());
+    let book_id = BookId::new("123".to_string()).unwrap();
     HttpResponse::Ok().body(format!("Book ID: {}", book_id.value()))
 }
